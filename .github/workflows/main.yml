@@ -1,0 +1,65 @@
+name: SonarQube Cloud Analyse
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    name: Build en Analyse
+    runs-on: windows-latest # Windows is vereist voor de .NET SonarScanner
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Cruciaal voor SonarCloud om historie te zien
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x' # Gebaseerd op jouw csproj
+
+      - name: Setup Node.js (voor Angular)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install SonarCloud scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      # 1. START ANALYSE
+      - name: Begin Sonar Analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet-sonarscanner begin /k:"BramM15_Own_FlowDesk" /o:"bramm15" `
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
+            /d:sonar.host.url="https://sonarcloud.io" `
+            /d:sonar.sources="src" `
+            /d:sonar.exclusions="**/obj/**,**/bin/**" `
+            /d:sonar.javascript.lcov.reportPaths="coverage/lcov.info"
+
+      # 2. BUILD FRONTEND (Angular)
+      - name: Install & Build Angular
+        run: |
+          npm install
+          npm run build
+
+      # 3. BUILD BACKEND (.NET)
+      - name: Build Backend
+        run: dotnet build backend.csproj --configuration Release
+
+      # 4. ROND ANALYSE AF (Upload naar dashboard)
+      - name: End Sonar Analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
