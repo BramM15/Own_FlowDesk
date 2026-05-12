@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FlowDesk.Domain\FlowDesk.Domain.csproj" />
+    <ProjectReference Include="..\FlowDesk.Application\FlowDesk.Application.csproj" />
+    <ProjectReference Include="..\FlowDesk.Infrastructure\FlowDesk.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
