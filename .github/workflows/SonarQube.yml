@@ -43,7 +43,7 @@ jobs:
           dotnet-sonarscanner begin /k:"BramM15_Own_FlowDesk" /o:"bramm15" `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
             /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.sources="src" `
+            /d:sonar.sources="src,backend" `
             /d:sonar.exclusions="**/obj/**,**/bin/**" `
             /d:sonar.javascript.lcov.reportPaths="coverage/lcov.info"
 
@@ -56,7 +56,6 @@ jobs:
 
       # 3. BUILD BACKEND (.NET)
       - name: Build Backend
-        working-directory: ./backend
         run: dotnet build backend.csproj --configuration Release
 
       # 4. ROND ANALYSE AF (Upload naar dashboard)
