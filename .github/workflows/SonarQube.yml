@@ -41,7 +41,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet-sonarscanner begin /k:"BramM15_Own_FlowDesk" /o:"bramm15" `
-            /d:sonar.token="$SONAR_TOKEN" `
+            /d:sonar.token="$($env:SONAR_TOKEN)" `
             /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.sources="src,backend" `
             /d:sonar.exclusions="**/obj/**,**/bin/**" `
@@ -63,4 +63,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+        run: dotnet-sonarscanner end /d:sonar.token="$($env:SONAR_TOKEN)"
