@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: flowdesk-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: FlowDeskPassword123!
+      POSTGRES_DB: flowdeskdb
+    ports:
+      - "5432:5432" 
+    volumes:
+      - postgres-data:/var/lib/postgresql/data 
+
+volumes:
+  postgres-data: 
