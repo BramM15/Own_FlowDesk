@@ -44,7 +44,7 @@ jobs:
             /d:sonar.token="$($env:SONAR_TOKEN)" `
             /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.sources="src,backend" `
-            /d:sonar.exclusions="**/obj/**,**/bin/**" `
+            /d:sonar.exclusions="**/Program.cs, **/Migrations/**, **/DTOs/**, **/obj/**, **/bin/**" `
             /d:sonar.qualitygate.wait=true
 
       # 2. BUILD FRONTEND (Angular)
