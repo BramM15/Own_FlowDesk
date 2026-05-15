@@ -45,6 +45,7 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.sources="src,backend" `
             /d:sonar.exclusions="**/Program.cs, **/Migrations/**, **/DTOs/**, **/obj/**, **/bin/**" `
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" `
             /d:sonar.qualitygate.wait=true
 
       # 2. BUILD FRONTEND (Angular)
@@ -57,6 +58,16 @@ jobs:
       # 3. BUILD BACKEND (.NET)
       - name: Build Backend
         run: dotnet build backend/FlowDesk.slnx --configuration Release
+
+        # 4. RUN TESTS & COLLECT COVERAGE
+      - name: Test Backend
+        run: |
+          dotnet test backend/FlowDesk.slnx `
+            --configuration Release `
+            --no-build `
+            --collect:"XPlat Code Coverage" `
+            --results-directory ./TestResults `
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       # 4. ROND ANALYSE AF (Upload naar dashboard)
       - name: End Sonar Analysis
