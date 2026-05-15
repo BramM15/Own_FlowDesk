@@ -5,9 +5,6 @@ public class Department
     public Guid Id { get; private set; }
     public string Name { get; private set; }
     public string Description { get; private set; }
-
-    // Parameterless constructor for EF
-    private Department() { }
     
     public Department(string name, string description)
     {
