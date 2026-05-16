@@ -23,11 +23,6 @@ public class UserHandler
         return await _repository.GetAllAsync();
     }
 
-    public async Task<List<User>> GetAllByRoleAsync(UserRole role)
-    {
-        return await _repository.GetAllByRoleAsync(role);
-    }
-
     public async Task<List<User>> GetByDepartmentAsync(Guid departmentId)
     {
         return await _repository.GetByDepartmentAsync(departmentId);
@@ -64,16 +59,20 @@ public class UserHandler
         return await _repository.AddAsync(user);
     }
 
-    public async Task<User> UpdateAsync(User user)
+    public async Task<User> UpdateAsync(Guid id, UserRole role, Guid departmentId)
     {
-        var existingUser = await _repository.GetAsync(user.Id);
+        var existingUser = await _repository.GetAsync(id);
 
         if (existingUser is null)
         {
             throw new Exception("User not found");
         }
+        
+        existingUser.Update(role, departmentId);
 
-        return await _repository.UpdateAsync(user);
+        await _repository.UpdateAsync(existingUser);
+        
+        return existingUser;
     }
 
     public async Task DeleteAsync(Guid id)

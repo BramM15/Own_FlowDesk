@@ -12,6 +12,8 @@ public class Department
         Name = name;
         Description = description;
     }
+    
+    private Department() { }
 
     public void Update(string name, string description)
     {

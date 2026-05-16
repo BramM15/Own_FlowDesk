@@ -39,13 +39,6 @@ public class UserRepository : IUserRepository
         return await _db.Users.ToListAsync();
     }
 
-    public async Task<List<User>> GetAllByRoleAsync(UserRole role)
-    {
-        return await _db.Users
-            .Where(x => x.Role == role)
-            .ToListAsync();
-    }
-
     public async Task<List<User>> GetByDepartmentAsync(Guid departmentId)
     {
         return await _db.Users
