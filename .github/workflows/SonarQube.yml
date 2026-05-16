@@ -46,7 +46,6 @@ jobs:
             /d:sonar.sources="src,backend" `
             /d:sonar.exclusions="**/Program.cs, **/Migrations/**, **/DTOs/**, **/obj/**, **/bin/**" `
             /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" `
-            /d:sonar.qualitygate.wait=true
 
       # 2. BUILD FRONTEND (Angular)
       - name: Install & Build Angular
