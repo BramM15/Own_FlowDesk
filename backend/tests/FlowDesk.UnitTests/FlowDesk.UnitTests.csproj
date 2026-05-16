@@ -22,4 +22,7 @@
     <ProjectReference Include="..\..\src\FlowDesk.Application\FlowDesk.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Moq" Version="4.20.0" />
+  </ItemGroup>
 </Project>
