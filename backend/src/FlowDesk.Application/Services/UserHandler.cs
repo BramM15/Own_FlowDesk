@@ -7,10 +7,12 @@ namespace FlowDesk.Application.Services;
 public class UserHandler
 {
     private readonly IUserRepository _repository;
+    private readonly IPasswordHasher _passwordHasher;
     
-    public UserHandler(IUserRepository repository)
+    public UserHandler(IUserRepository repository, IPasswordHasher passwordHasher)
     {
         _repository = repository;
+        _passwordHasher = passwordHasher;
     }
     
     public async Task<User?> GetAsync(Guid id)
@@ -47,12 +49,14 @@ public class UserHandler
         {
             throw new Exception("Email already exists");
         }
+        
+        var hashedPassword = _passwordHasher.Hash(passwordHash);
 
         var user = new User(
             firstName,
             lastName,
             email,
-            passwordHash,
+            hashedPassword,
             role,
             departmentId);
 
