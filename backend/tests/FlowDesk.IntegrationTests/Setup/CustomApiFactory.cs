@@ -38,7 +38,7 @@ public class CustomApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         // Zorg ervoor dat de database gemigreerd is voor de testen
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        await db.Database.EnsureCreatedAsync(); 
+        await db.Database.MigrateAsync(); 
     }
 
     public new async Task DisposeAsync()
