@@ -5,7 +5,6 @@ using FlowDesk.Infrastructure.Repositories;
 using FlowDesk.IntegrationTests.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace FlowDesk.IntegrationTests.Repositories;
 
@@ -25,7 +24,7 @@ public class UserRepositoryTests : IClassFixture<CustomApiFactory>
         using var scope = _factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var repository = new UserRepository(dbContext);
-        
+
         // 1. Maak eerst een department aan vanwege de Foreign Key relatie
         var department = new Department("IT", "IT Afdeling");
         dbContext.Departments.Add(department);
@@ -51,7 +50,7 @@ public class UserRepositoryTests : IClassFixture<CustomApiFactory>
         using var scope = _factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var repository = new UserRepository(dbContext);
-        
+
         var department = new Department("HR", "HR Afdeling");
         dbContext.Departments.Add(department);
         var user = new User("Bob", "Smit", "bob@test.com", "hash", UserRole.Admin, department.Id);

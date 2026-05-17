@@ -2,14 +2,13 @@
 using FlowDesk.Application.Services;
 using FlowDesk.Domain.Entities;
 using Moq;
-using Xunit;
 
 namespace FlowDesk.UnitTests.Application;
 
 public class TicketCommentHandlerTests
 {
-    private readonly Mock<ITicketCommentRepository> _mockRepo;
     private readonly TicketCommentHandler _handler;
+    private readonly Mock<ITicketCommentRepository> _mockRepo;
 
     public TicketCommentHandlerTests()
     {
@@ -26,8 +25,8 @@ public class TicketCommentHandlerTests
         var ticketId = Guid.NewGuid();
         var comments = new List<TicketComment>
         {
-            new TicketComment("Comment 1", ticketId, Guid.NewGuid()),
-            new TicketComment("Comment 2", ticketId, Guid.NewGuid())
+            new("Comment 1", ticketId, Guid.NewGuid()),
+            new("Comment 2", ticketId, Guid.NewGuid())
         };
 
         _mockRepo.Setup(r => r.GetByTicketIdAsync(ticketId)).ReturnsAsync(comments);
@@ -53,7 +52,7 @@ public class TicketCommentHandlerTests
 
         // Laat de repository de gemaakte entiteit netjes teruggeven
         _mockRepo.Setup(r => r.AddAsync(It.IsAny<TicketComment>()))
-                 .ReturnsAsync((TicketComment c) => c);
+            .ReturnsAsync((TicketComment c) => c);
 
         // Act
         var result = await _handler.CreateAsync(content, ticketId, userId);
@@ -81,7 +80,7 @@ public class TicketCommentHandlerTests
         var exception = await Assert.ThrowsAsync<Exception>(() => _handler.DeleteAsync(commentId));
 
         Assert.Equal("Comment not found", exception.Message);
-        
+
         // Zorg ervoor dat Delete NOOIT wordt aangeroepen als hij niet bestaat
         _mockRepo.Verify(r => r.DeleteAsync(It.IsAny<Guid>()), Times.Never);
     }

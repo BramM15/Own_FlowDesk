@@ -1,4 +1,5 @@
 // src/FlowDesk.Infrastructure/Repositories/DepartmentRepository.cs
+
 using FlowDesk.Application.Interfaces;
 using FlowDesk.Domain.Entities;
 using FlowDesk.Infrastructure.Database;
@@ -18,7 +19,7 @@ public class DepartmentRepository : IDepartmentRepository
     public async Task AddAsync(Department department)
     {
         await _db.Departments.AddAsync(department);
-        await _db.SaveChangesAsync(); 
+        await _db.SaveChangesAsync();
     }
 
     public async Task<List<Department>> GetAllAsync()

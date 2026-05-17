@@ -2,14 +2,13 @@
 using FlowDesk.Application.Services;
 using FlowDesk.Domain.Entities;
 using Moq;
-using Xunit;
 
 namespace FlowDesk.UnitTests.Application;
 
 public class DepartmentHandlerTests
 {
-    private readonly Mock<IDepartmentRepository> _mockRepo;
     private readonly DepartmentHandler _handler;
+    private readonly Mock<IDepartmentRepository> _mockRepo;
 
     public DepartmentHandlerTests()
     {

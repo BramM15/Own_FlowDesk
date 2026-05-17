@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using FlowDesk.API.DTOs;
 using FlowDesk.Domain.Entities;
 using FlowDesk.IntegrationTests.Setup;
-using Xunit;
 
 namespace FlowDesk.IntegrationTests.Endpoints;
 
@@ -28,7 +27,7 @@ public class DepartmentEndpointsTests : IClassFixture<CustomApiFactory>
         // Assert
         response.EnsureSuccessStatusCode();
         var returnedDepartment = await response.Content.ReadFromJsonAsync<Department>();
-        
+
         Assert.NotNull(returnedDepartment);
         Assert.Equal("Finance", returnedDepartment.Name);
         Assert.NotEqual(Guid.Empty, returnedDepartment.Id);
@@ -54,13 +53,14 @@ public class DepartmentEndpointsTests : IClassFixture<CustomApiFactory>
     public async Task DeleteDepartment_ReturnsNoContent_WhenSuccessful()
     {
         // Arrange
-        var createResponse = await _client.PostAsJsonAsync("/departments", new CreateDepartmentRequest("Operations", "Ops"));
+        var createResponse =
+            await _client.PostAsJsonAsync("/departments", new CreateDepartmentRequest("Operations", "Ops"));
         var department = await createResponse.Content.ReadFromJsonAsync<Department>();
 
         // Act
         var deleteResponse = await _client.DeleteAsync($"/departments/{department!.Id}");
-        var getAgainResponse = await _client.GetAsync($"/departments"); 
-        
+        var getAgainResponse = await _client.GetAsync("/departments");
+
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
     }

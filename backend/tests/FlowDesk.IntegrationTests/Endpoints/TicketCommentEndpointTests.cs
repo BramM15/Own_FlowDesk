@@ -1,13 +1,13 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using FlowDesk.API.DTOs; // Nodig voor jouw CreateCommentRequest
+using FlowDesk.API.DTOs;
 using FlowDesk.Domain.Entities;
 using FlowDesk.Domain.Enums;
 using FlowDesk.Infrastructure.Database;
 using FlowDesk.IntegrationTests.Setup;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
+// Nodig voor jouw CreateCommentRequest
 
 namespace FlowDesk.IntegrationTests.Endpoints;
 
@@ -30,18 +30,18 @@ public class TicketCommentEndpointsTests : IClassFixture<CustomApiFactory>
         using (var scope = _factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            
+
             var dept = new Department("HR", "HR");
             db.Departments.Add(dept);
-            
+
             var user = new User("Sam", "A", "sam@hr.com", "hash", UserRole.Support, dept.Id);
             db.Users.Add(user);
-            
+
             var ticket = new Ticket("Ziekteverzuim", "Vraag over systeem", TicketPriority.Low, user.Id, dept.Id);
             db.Tickets.Add(ticket);
-            
+
             await db.SaveChangesAsync();
-            
+
             ticketId = ticket.Id;
             userId = user.Id;
         }
@@ -53,8 +53,8 @@ public class TicketCommentEndpointsTests : IClassFixture<CustomApiFactory>
         var response = await _client.PostAsJsonAsync($"/tickets/{ticketId}/comments", request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode); 
-        
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
         var jsonResponse = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal("Kan je me hier morgen over bellen?", jsonResponse.GetProperty("content").GetString());
         Assert.Equal(ticketId.ToString(), jsonResponse.GetProperty("ticketId").GetString());
@@ -71,14 +71,14 @@ public class TicketCommentEndpointsTests : IClassFixture<CustomApiFactory>
             var dept = new Department("DevOps", "Infra");
             var user = new User("Ops", "User", "ops@dev.com", "hash", UserRole.Support, dept.Id);
             var ticket = new Ticket("Server down", "Geen ping", TicketPriority.Critical, user.Id, dept.Id);
-            
+
             db.Departments.Add(dept);
             db.Users.Add(user);
             db.Tickets.Add(ticket);
-            
+
             var comment = new TicketComment("Onderzoek gestart in de logs.", ticket.Id, user.Id);
             db.TicketComments.Add(comment);
-            
+
             await db.SaveChangesAsync();
             ticketId = ticket.Id;
         }
@@ -89,7 +89,7 @@ public class TicketCommentEndpointsTests : IClassFixture<CustomApiFactory>
         // Assert
         response.EnsureSuccessStatusCode();
         var jsonResponse = await response.Content.ReadFromJsonAsync<JsonElement>();
-        
+
         // Controleer of we een Array terugkrijgen en of deze minimaal 1 element bevat
         Assert.Equal(JsonValueKind.Array, jsonResponse.ValueKind);
         Assert.True(jsonResponse.GetArrayLength() > 0);
@@ -108,12 +108,12 @@ public class TicketCommentEndpointsTests : IClassFixture<CustomApiFactory>
             var user = new User("U", "I", "u@i.nl", "h", UserRole.Support, dept.Id);
             var ticket = new Ticket("T", "D", TicketPriority.Low, user.Id, dept.Id);
             var comment = new TicketComment("Typefoutje", ticket.Id, user.Id);
-            
+
             db.Departments.Add(dept);
             db.Users.Add(user);
             db.Tickets.Add(ticket);
             db.TicketComments.Add(comment);
-            
+
             await db.SaveChangesAsync();
             commentId = comment.Id;
         }
@@ -122,6 +122,6 @@ public class TicketCommentEndpointsTests : IClassFixture<CustomApiFactory>
         var response = await _client.DeleteAsync($"/tickets/comments/{commentId}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode); 
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 }

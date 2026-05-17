@@ -7,7 +7,6 @@ using FlowDesk.Domain.Enums;
 using FlowDesk.Infrastructure.Database;
 using FlowDesk.IntegrationTests.Setup;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace FlowDesk.IntegrationTests.Endpoints;
 
@@ -32,17 +31,18 @@ public class UserEndpointsTests : IClassFixture<CustomApiFactory>
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var department = new Department("Ops", "Operations");
             db.Departments.Add(department);
-            
+
             // Deze email zit al in de database!
             var existingUser = new User("Dirk", "Vries", "dirk@ops.com", "hash", UserRole.Support, department.Id);
             db.Users.Add(existingUser);
-            
+
             await db.SaveChangesAsync();
             departmentId = department.Id;
         }
 
         // We proberen een nieuwe user aan te maken met hetzelfde emailadres
-        var request = new CreateUserRequest("Andere", "Naam", "dirk@ops.com", "Wachtwoord!", UserRole.Support, departmentId);
+        var request = new CreateUserRequest("Andere", "Naam", "dirk@ops.com", "Wachtwoord!", UserRole.Support,
+            departmentId);
 
         // Act
         var response = await _client.PostAsJsonAsync("/users", request);
@@ -65,7 +65,7 @@ public class UserEndpointsTests : IClassFixture<CustomApiFactory>
             var dept1 = new Department("Oud", "Oud");
             var dept2 = new Department("Nieuw", "Nieuw");
             db.Departments.AddRange(dept1, dept2);
-            
+
             var user = new User("Erik", "B", "erik@test.com", "hash", UserRole.Support, dept1.Id);
             db.Users.Add(user);
             await db.SaveChangesAsync();
@@ -83,7 +83,7 @@ public class UserEndpointsTests : IClassFixture<CustomApiFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        
+
         var jsonResponse = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal((int)UserRole.Admin, jsonResponse.GetProperty("role").GetInt32());
         Assert.Equal(newDepartmentId.ToString(), jsonResponse.GetProperty("departmentId").GetString());

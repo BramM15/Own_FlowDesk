@@ -1,14 +1,14 @@
+using System.Text;
+using FlowDesk.API.Endpoints;
+using FlowDesk.API.Middleware;
 using FlowDesk.Application.Interfaces;
 using FlowDesk.Application.Services;
+using FlowDesk.Infrastructure.Authentication;
 using FlowDesk.Infrastructure.Database;
 using FlowDesk.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using FlowDesk.API.Endpoints;
-using FlowDesk.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using FlowDesk.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +39,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
@@ -54,28 +56,26 @@ builder.Services.AddScoped<TicketHandler>();
 builder.Services.AddScoped<ITicketCommentRepository, TicketCommentRepository>();
 builder.Services.AddScoped<TicketCommentHandler>();
 
-builder.Services.AddOpenApi(); // Voor Swagger/OpenAPI
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    
-    if (db.Database.IsRelational())
-    {
-        db.Database.Migrate();
-    }
+
+    if (db.Database.IsRelational()) db.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseExceptionHandler();
+
 app.MapLoginEndpoints();
 app.MapDepartmentEndpoints();
 app.MapUserEndpoints();

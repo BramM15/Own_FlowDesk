@@ -1,5 +1,5 @@
-﻿using FlowDesk.Application.Services;
-using FlowDesk.API.DTOs;
+﻿using FlowDesk.API.DTOs;
+using FlowDesk.Application.Services;
 
 namespace FlowDesk.API.Endpoints;
 
@@ -8,7 +8,8 @@ public static class TicketEndpoints
     public static void MapTicketEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/tickets")
-            .WithTags("Tickets");
+            .WithTags("Tickets")
+            .RequireAuthorization();
 
         group.MapGet("/", async (TicketHandler handler) =>
             {

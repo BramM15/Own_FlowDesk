@@ -1,6 +1,6 @@
 ﻿using FlowDesk.API.DTOs;
 using FlowDesk.Application.Services;
-using FlowDesk.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FlowDesk.API.Endpoints;
 
@@ -38,7 +38,7 @@ public static class UserEndpoints
                 return user is null ? Results.NotFound() : Results.Ok(user);
             })
             .WithName("GetUserByEmail");
-        
+
         group.MapPost("/", async (CreateUserRequest request, UserHandler handler) =>
             {
                 var newUser = await handler.CreateAsync(
@@ -46,20 +46,23 @@ public static class UserEndpoints
                     request.DepartmentId);
                 return Results.Ok(newUser);
             })
-            .WithName("CreateUser");
+            .WithName("CreateUser")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
 
         group.MapPut("/{id}", async (Guid id, UpdateUserRequest request, UserHandler handler) =>
             {
                 var updatedUser = await handler.UpdateAsync(id, request.Role, request.DepartmentId);
                 return Results.Ok(updatedUser);
             })
-            .WithName("UpdateUser");
+            .WithName("UpdateUser")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
 
         group.MapDelete("/{id:guid}", async (Guid id, UserHandler handler) =>
             {
                 await handler.DeleteAsync(id);
                 return Results.NoContent();
             })
-            .WithName("DeleteUser");
+            .WithName("DeleteUser")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
     }
 }

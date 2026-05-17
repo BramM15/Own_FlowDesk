@@ -6,15 +6,15 @@ namespace FlowDesk.Application.Services;
 
 public class UserHandler
 {
-    private readonly IUserRepository _repository;
     private readonly IPasswordHasher _passwordHasher;
-    
+    private readonly IUserRepository _repository;
+
     public UserHandler(IUserRepository repository, IPasswordHasher passwordHasher)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
     }
-    
+
     public async Task<User?> GetAsync(Guid id)
     {
         return await _repository.GetAsync(id);
@@ -45,11 +45,8 @@ public class UserHandler
     {
         var emailExists = await _repository.ExistsByEmailAsync(email);
 
-        if (emailExists)
-        {
-            throw new Exception("Email already exists");
-        }
-        
+        if (emailExists) throw new Exception("Email already exists");
+
         var hashedPassword = _passwordHasher.Hash(passwordHash);
 
         var user = new User(
@@ -67,15 +64,12 @@ public class UserHandler
     {
         var existingUser = await _repository.GetAsync(id);
 
-        if (existingUser is null)
-        {
-            throw new Exception("User not found");
-        }
-        
+        if (existingUser is null) throw new Exception("User not found");
+
         existingUser.Update(role, departmentId);
 
         await _repository.UpdateAsync(existingUser);
-        
+
         return existingUser;
     }
 
@@ -83,12 +77,8 @@ public class UserHandler
     {
         var existingUser = await _repository.GetAsync(id);
 
-        if (existingUser is null)
-        {
-            throw new Exception("User not found");
-        }
+        if (existingUser is null) throw new Exception("User not found");
 
         await _repository.DeleteAsync(id);
     }
-    
 }

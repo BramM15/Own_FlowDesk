@@ -26,10 +26,7 @@ public class TicketCommentHandler
     public async Task DeleteAsync(Guid id)
     {
         var comment = await _repository.GetAsync(id);
-        if (comment is null)
-        {
-            throw new Exception("Comment not found");
-        }
+        if (comment is null) throw new Exception("Comment not found");
         await _repository.DeleteAsync(id);
     }
 }
