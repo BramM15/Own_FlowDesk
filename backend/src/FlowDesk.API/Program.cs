@@ -21,6 +21,9 @@ builder.Services.AddScoped<UserHandler>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<TicketHandler>();
 
+builder.Services.AddScoped<ITicketCommentRepository, TicketCommentRepository>();
+builder.Services.AddScoped<TicketCommentHandler>();
+
 builder.Services.AddOpenApi(); // Voor Swagger/OpenAPI
 
 var app = builder.Build();
@@ -45,5 +48,6 @@ app.UseHttpsRedirection();
 app.MapDepartmentEndpoints();
 app.MapUserEndpoints();
 app.MapTicketEndpoints();
+app.MapTicketCommentEndpoints();
 
 app.Run();
