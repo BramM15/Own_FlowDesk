@@ -53,7 +53,7 @@ jobs:
       - name: Install & Build Angular
         working-directory: ./frontend
         run: |
-          npm install
+          npm ci
           npm run build
 
       # 3. BUILD BACKEND (.NET)

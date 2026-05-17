@@ -30,7 +30,18 @@ public class JwtProvider : IJwtProvider
             new Claim("DepartmentId", user.DepartmentId.ToString())
         };
 
-        var secret = _configuration["JwtSettings:Secret"]; // Haal uit appsettings.json
+        var secret = _configuration["JwtSettings:Secret"];
+        
+        if (string.IsNullOrEmpty(secret))
+        {
+            throw new InvalidOperationException("De JWT Secret is niet geconfigureerd in User Secrets.");
+        }
+        
+        if (secret.Length < 32)
+        {
+            throw new InvalidOperationException("De JWT Secret moet minimaal 32 tekens lang zijn.");
+        }
+        
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
