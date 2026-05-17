@@ -20,6 +20,9 @@ public class CustomApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Injecteer de missende JWT-instelling specifiek voor de testomgeving
+        builder.UseSetting("JwtSettings:Secret", "dit_is_een_super_geheim_test_secret_van_minimaal_32_tekens!");
+
         builder.ConfigureServices(services =>
         {
             // Verwijder de bestaande DbContext configuratie
