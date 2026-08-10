@@ -44,4 +44,9 @@ public class DepartmentRepository : IDepartmentRepository
         _db.Departments.Remove(department);
         await _db.SaveChangesAsync();
     }
+
+    public async Task<bool> ExistsByDepartmentIdAsync(Guid departmentId)
+    {
+        return await _db.Departments.AnyAsync(d => d.Id == departmentId);
+    }
 }
