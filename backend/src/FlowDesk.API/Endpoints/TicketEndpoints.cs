@@ -14,7 +14,24 @@ public static class TicketEndpoints
         group.MapGet("/", async (TicketHandler handler) =>
             {
                 var tickets = await handler.GetAllAsync();
-                return Results.Ok(tickets);
+
+                var response = tickets.Select(t => new TicketResponse(
+                    t.Id,
+                    t.Title,
+                    t.Description,
+                    t.Status,
+                    t.Priority,
+                    t.CreatedAt,
+                    t.ClosedAt,
+                    t.CreatedByUserId,
+                    $"{t.CreatedByUser.FirstName} {t.CreatedByUser.LastName}",
+                    t.AssignedToUserId,
+                    t.AssignedToUser is null
+                        ? null
+                        : $"{t.AssignedToUser.FirstName} {t.AssignedToUser.LastName}",
+                    t.DepartmentId));
+
+                return Results.Ok(response);
             })
             .WithName("GetAllTickets");
 

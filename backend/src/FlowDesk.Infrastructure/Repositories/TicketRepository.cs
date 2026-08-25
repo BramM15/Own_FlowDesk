@@ -21,7 +21,10 @@ public class TicketRepository : ITicketRepository
 
     public async Task<List<Ticket>> GetAllAsync()
     {
-        return await _db.Tickets.ToListAsync();
+        return await _db.Tickets
+            .Include(x => x.CreatedByUser)
+            .Include(x => x.AssignedToUser)
+            .ToListAsync();
     }
 
     public async Task<List<Ticket>> GetByDepartmentAsync(Guid departmentId)

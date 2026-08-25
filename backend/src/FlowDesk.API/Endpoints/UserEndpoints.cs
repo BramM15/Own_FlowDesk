@@ -15,7 +15,7 @@ public static class UserEndpoints
             {
                 var users = await handler.GetAllAsync();
                 
-                var response = users.Select(u => new UserResponse(u.FirstName, u.LastName, u.Email, u.Role, u.DepartmentId));
+                var response = users.Select(u => new UserResponse(u.Id, u.FirstName, u.LastName, u.Email, u.Role, u.DepartmentId));
                 return Results.Ok(response);
             })
             .WithName("GetAllUsers");
@@ -46,8 +46,7 @@ public static class UserEndpoints
                 var newUser = await handler.CreateAsync(
                     request.FirstName, request.LastName, request.Email, request.PasswordHash, request.Role,
                     request.DepartmentId);
-                
-                var response = new UserResponse(newUser.FirstName, newUser.LastName, newUser.Email, newUser.Role, newUser.DepartmentId);
+                var response = new UserResponse(newUser.Id, newUser.FirstName, newUser.LastName, newUser.Email, newUser.Role, newUser.DepartmentId);
                 return Results.Ok(response);
             })
             .WithName("CreateUser")
@@ -56,7 +55,7 @@ public static class UserEndpoints
         group.MapPut("/{id}", async (Guid id, UpdateUserRequest request, UserHandler handler) =>
             {
                 var updatedUser = await handler.UpdateAsync(id, request.Role, request.DepartmentId);
-                var response = new UserResponse(updatedUser.FirstName, updatedUser.LastName, updatedUser.Email, updatedUser.Role, updatedUser.DepartmentId);
+                var response = new UserResponse(updatedUser.Id ,updatedUser.FirstName, updatedUser.LastName, updatedUser.Email, updatedUser.Role, updatedUser.DepartmentId);
                 return Results.Ok(response);
             })
             .WithName("UpdateUser")
