@@ -1,5 +1,6 @@
 ﻿using FlowDesk.API.DTOs;
 using FlowDesk.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FlowDesk.API.Endpoints;
 
@@ -15,7 +16,8 @@ public static class DepartmentEndpoints
                 var result = await handler.AddAsync(request.Name, request.Description);
                 return Results.Ok(result);
             })
-            .WithName("CreateDepartment");
+            .WithName("CreateDepartment")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
 
         group.MapGet("/", async (DepartmentHandler handler) =>
             {
@@ -29,13 +31,16 @@ public static class DepartmentEndpoints
                 var updated = await handler.UpdateAsync(id, request.Name, request.Description);
                 return updated is null ? Results.NotFound() : Results.Ok(updated);
             })
-            .WithName("UpdateDepartment");
+            .WithName("UpdateDepartment")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
+
 
         group.MapDelete("/{id}", async (Guid id, DepartmentHandler handler) =>
             {
                 var deleted = await handler.DeleteAsync(id);
                 return deleted ? Results.NoContent() : Results.NotFound();
             })
-            .WithName("DeleteDepartment");
+            .WithName("DeleteDepartment")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" });
     }
 }

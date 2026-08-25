@@ -2,20 +2,23 @@
 using FlowDesk.Application.Services;
 using FlowDesk.Domain.Entities;
 using FlowDesk.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Moq;
-using Xunit;
 
 namespace FlowDesk.UnitTests.Application;
 
 public class TicketHandlerTests
 {
-    private readonly Mock<ITicketRepository> _mockRepo;
     private readonly TicketHandler _handler;
+    private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
+    private readonly Mock<ITicketRepository> _mockRepo;
 
     public TicketHandlerTests()
     {
         _mockRepo = new Mock<ITicketRepository>();
-        _handler = new TicketHandler(_mockRepo.Object);
+        _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        
+        _handler = new TicketHandler(_mockRepo.Object, _mockHttpContextAccessor.Object);
     }
 
     // --- GET METHODS ---
@@ -42,8 +45,8 @@ public class TicketHandlerTests
         // Arrange
         var tickets = new List<Ticket>
         {
-            new Ticket("T1", "D1", TicketPriority.Low, Guid.NewGuid(), Guid.NewGuid()),
-            new Ticket("T2", "D2", TicketPriority.High, Guid.NewGuid(), Guid.NewGuid())
+            new("T1", "D1", TicketPriority.Low, Guid.NewGuid(), Guid.NewGuid()),
+            new("T2", "D2", TicketPriority.High, Guid.NewGuid(), Guid.NewGuid())
         };
         _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(tickets);
 
@@ -59,7 +62,7 @@ public class TicketHandlerTests
     {
         // Arrange
         var deptId = Guid.NewGuid();
-        var tickets = new List<Ticket> { new Ticket("T", "D", TicketPriority.Low, Guid.NewGuid(), deptId) };
+        var tickets = new List<Ticket> { new("T", "D", TicketPriority.Low, Guid.NewGuid(), deptId) };
         _mockRepo.Setup(r => r.GetByDepartmentAsync(deptId)).ReturnsAsync(tickets);
 
         // Act
@@ -75,7 +78,7 @@ public class TicketHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var tickets = new List<Ticket> { new Ticket("T", "D", TicketPriority.Low, userId, Guid.NewGuid()) };
+        var tickets = new List<Ticket> { new("T", "D", TicketPriority.Low, userId, Guid.NewGuid()) };
         _mockRepo.Setup(r => r.GetByCreatedUserAsync(userId)).ReturnsAsync(tickets);
 
         // Act
@@ -92,8 +95,9 @@ public class TicketHandlerTests
         // Arrange
         var assignedUserId = Guid.NewGuid();
         var ticket = new Ticket("T", "D", TicketPriority.Low, Guid.NewGuid(), Guid.NewGuid());
-        ticket.Update("T", "D", TicketStatus.InProgress, TicketPriority.Low, assignedUserId, ticket.DepartmentId); // Assign user
-        
+        ticket.Update("T", "D", TicketStatus.InProgress, TicketPriority.Low, assignedUserId,
+            ticket.DepartmentId); // Assign user
+
         var tickets = new List<Ticket> { ticket };
         _mockRepo.Setup(r => r.GetByAssignedUserAsync(assignedUserId)).ReturnsAsync(tickets);
 
@@ -118,7 +122,7 @@ public class TicketHandlerTests
         var deptId = Guid.NewGuid();
 
         _mockRepo.Setup(r => r.AddAsync(It.IsAny<Ticket>()))
-                 .ReturnsAsync((Ticket t) => t);
+            .ReturnsAsync((Ticket t) => t);
 
         // Act
         var result = await _handler.CreateAsync(title, description, priority, userId, deptId);
@@ -127,7 +131,7 @@ public class TicketHandlerTests
         Assert.NotNull(result);
         Assert.Equal(title, result.Title);
         Assert.Equal(TicketStatus.Open, result.Status);
-        
+
         _mockRepo.Verify(r => r.AddAsync(It.IsAny<Ticket>()), Times.Once);
     }
 
@@ -141,7 +145,7 @@ public class TicketHandlerTests
         _mockRepo.Setup(r => r.GetAsync(ticketId)).ReturnsAsync((Ticket?)null);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => 
+        var exception = await Assert.ThrowsAsync<Exception>(() =>
             _handler.UpdateAsync(ticketId, "T", "D", TicketStatus.Open, TicketPriority.Low, null, Guid.NewGuid()));
 
         Assert.Equal("Ticket not found", exception.Message);
@@ -156,13 +160,14 @@ public class TicketHandlerTests
         _mockRepo.Setup(r => r.GetAsync(ticket.Id)).ReturnsAsync(ticket);
 
         // Act
-        var result = await _handler.UpdateAsync(ticket.Id, "Nieuw", "Nieuw", TicketStatus.InProgress, TicketPriority.High, null, ticket.DepartmentId);
+        var result = await _handler.UpdateAsync(ticket.Id, "Nieuw", "Nieuw", TicketStatus.InProgress,
+            TicketPriority.High, null, ticket.DepartmentId);
 
         // Assert
         Assert.Equal("Nieuw", result.Title);
         Assert.Equal(TicketStatus.InProgress, result.Status);
         Assert.Equal(TicketPriority.High, result.Priority);
-        
+
         _mockRepo.Verify(r => r.UpdateAsync(ticket), Times.Once);
     }
 

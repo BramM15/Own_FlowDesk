@@ -13,7 +13,8 @@ public static class LoginEndpoint
         group.MapPost("/", async (LoginRequest request, AuthHandler handler) =>
             {
                 var result = await handler.LoginAsync(request.Email, request.Password);
-                return Results.Ok(result);
+                var response = new LoginResponse(result);
+                return Results.Ok(response);
             })
             .WithName("Login");
     }

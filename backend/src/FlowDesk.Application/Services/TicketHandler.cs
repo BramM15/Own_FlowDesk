@@ -1,16 +1,39 @@
-﻿using FlowDesk.Application.Interfaces;
+﻿using System.Security.Claims;
+using FlowDesk.Application.Interfaces;
 using FlowDesk.Domain.Entities;
 using FlowDesk.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace FlowDesk.Application.Services;
 
 public class TicketHandler
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ITicketRepository _repository;
 
-    public TicketHandler(ITicketRepository repository)
+    public TicketHandler(ITicketRepository repository, IHttpContextAccessor httpContextAccessor)
     {
+        _httpContextAccessor = httpContextAccessor;
         _repository = repository;
+    }
+    
+    private (Guid UserId, string Role, Guid DepartmentId)? GetCurrentUserContext()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        if (user == null || !user.Identity!.IsAuthenticated) return null;
+
+        Console.WriteLine(user);
+        
+        var userIdStr = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var roleStr = user.FindFirst(ClaimTypes.Role)?.Value;
+        var departmentIdStr = user.FindFirst("DepartmentId")?.Value;
+
+        if (string.IsNullOrEmpty(userIdStr) || string.IsNullOrEmpty(roleStr) || string.IsNullOrEmpty(departmentIdStr) || !Guid.TryParse(userIdStr, out Guid userId) || !Guid.TryParse(departmentIdStr, out Guid userDepartmentId))
+        {
+            return null;
+        }
+
+        return (userId, roleStr, userDepartmentId);
     }
 
     public async Task<Ticket?> GetAsync(Guid id)
@@ -25,17 +48,30 @@ public class TicketHandler
 
     public async Task<List<Ticket>> GetByDepartmentAsync(Guid departmentId)
     {
-        return await _repository.GetByDepartmentAsync(departmentId);
+        var context = GetCurrentUserContext();
+        
+        if (context == null)
+        {
+            throw new UnauthorizedAccessException("Gebruiker is niet ingelogd.");
+        }
+        
+        if  (!context.Value.DepartmentId.Equals(departmentId) || context.Value.Role is "User"){
+            throw new UnauthorizedAccessException("Gebruiker is unauthenticated.");
+        }
+        
+        var allTickets = await _repository.GetByDepartmentAsync(departmentId);;
+        
+        return allTickets;
     }
 
     public async Task<List<Ticket>> GetByCreatedUserAsync(Guid userId)
     {
-        return await  _repository.GetByCreatedUserAsync(userId);
+        return await _repository.GetByCreatedUserAsync(userId);
     }
-    
+
     public async Task<List<Ticket>> GetByAssignedUserAsync(Guid userId)
     {
-        return await  _repository.GetByAssignedUserAsync(userId);
+        return await _repository.GetByAssignedUserAsync(userId);
     }
 
     public async Task<Ticket> CreateAsync(
@@ -66,10 +102,7 @@ public class TicketHandler
     {
         var existingTicket = await _repository.GetAsync(id);
 
-        if (existingTicket is null)
-        {
-            throw new Exception("Ticket not found");
-        }
+        if (existingTicket is null) throw new Exception("Ticket not found");
 
         existingTicket.Update(
             title,
@@ -88,10 +121,7 @@ public class TicketHandler
     {
         var existingTicket = await _repository.GetAsync(id);
 
-        if (existingTicket is null)
-        {
-            throw new Exception("Ticket not found");
-        }
+        if (existingTicket is null) throw new Exception("Ticket not found");
 
         await _repository.DeleteAsync(id);
     }

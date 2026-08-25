@@ -2,7 +2,6 @@
 
 using FlowDesk.Application.Interfaces;
 using FlowDesk.Domain.Entities;
-using FlowDesk.Domain.Enums;
 using FlowDesk.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 

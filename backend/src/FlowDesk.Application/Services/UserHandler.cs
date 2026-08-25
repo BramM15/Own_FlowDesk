@@ -16,7 +16,7 @@ public class UserHandler
         _passwordHasher = passwordHasher;
         _repositoryDepartment = repositoryDepartment;
     }
-    
+
     public async Task<User?> GetAsync(Guid id)
     {
         return await _repository.GetAsync(id);
@@ -77,15 +77,12 @@ public class UserHandler
     {
         var existingUser = await _repository.GetAsync(id);
 
-        if (existingUser is null)
-        {
-            throw new Exception("User not found");
-        }
-        
+        if (existingUser is null) throw new Exception("User not found");
+
         existingUser.Update(role, departmentId);
 
         await _repository.UpdateAsync(existingUser);
-        
+
         return existingUser;
     }
 
@@ -93,12 +90,8 @@ public class UserHandler
     {
         var existingUser = await _repository.GetAsync(id);
 
-        if (existingUser is null)
-        {
-            throw new Exception("User not found");
-        }
+        if (existingUser is null) throw new Exception("User not found");
 
         await _repository.DeleteAsync(id);
     }
-    
 }

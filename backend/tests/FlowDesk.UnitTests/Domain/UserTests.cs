@@ -1,6 +1,5 @@
 ﻿using FlowDesk.Domain.Entities;
 using FlowDesk.Domain.Enums;
-using Xunit;
 
 namespace FlowDesk.UnitTests.Domain;
 
@@ -28,7 +27,7 @@ public class UserTests
         Assert.Equal(passwordHash, user.PasswordHash);
         Assert.Equal(role, user.Role);
         Assert.Equal(departmentId, user.DepartmentId);
-        
+
         // Controleer of de CreatedAt ongeveer 'nu' is ingesteld
         var timeDifference = DateTime.UtcNow - user.CreatedAt;
         Assert.True(timeDifference.TotalSeconds < 1);

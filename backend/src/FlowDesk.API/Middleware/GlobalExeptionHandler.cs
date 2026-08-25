@@ -1,4 +1,5 @@
 ﻿// backend/src/FlowDesk.API/Middleware/GlobalExceptionHandler.cs
+
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,19 +15,20 @@ public class GlobalExceptionHandler : IExceptionHandler
     }
 
     public async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext, 
-        Exception exception, 
+        HttpContext httpContext,
+        Exception exception,
         CancellationToken cancellationToken)
     {
         _logger.LogError(exception, "Er is een fout opgetreden: {Message}", exception.Message);
-        
+
         var problemDetails = new ProblemDetails
         {
             Instance = httpContext.Request.Path,
             Detail = exception.Message
         };
-        
-        if (exception is ArgumentException || exception.Message.Contains("Invalid") || exception.Message.Contains("exists"))
+
+        if (exception is ArgumentException || exception.Message.Contains("Invalid") ||
+            exception.Message.Contains("exists"))
         {
             // Bijvoorbeeld: "Email already exists" of "Invalid credentials" uit je eerdere code
             problemDetails.Status = StatusCodes.Status400BadRequest;
@@ -42,10 +44,10 @@ public class GlobalExceptionHandler : IExceptionHandler
             problemDetails.Status = StatusCodes.Status500InternalServerError;
             problemDetails.Title = "Interne Server Fout";
         }
-        
+
         httpContext.Response.StatusCode = problemDetails.Status.Value;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-        
-        return true; 
+
+        return true;
     }
 }

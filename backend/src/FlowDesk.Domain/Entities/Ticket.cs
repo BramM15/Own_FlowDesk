@@ -4,6 +4,28 @@ namespace FlowDesk.Domain.Entities;
 
 public class Ticket
 {
+    public Ticket(
+        string title,
+        string description,
+        TicketPriority priority,
+        Guid createdByUserId,
+        Guid departmentId)
+    {
+        Id = Guid.NewGuid();
+        Title = title;
+        Description = description;
+        Status = TicketStatus.Open;
+        Priority = priority;
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+        CreatedByUserId = createdByUserId;
+        DepartmentId = departmentId;
+    }
+
+    private Ticket()
+    {
+    }
+
     public Guid Id { get; private set; }
     public string Title { get; private set; }
     public string Description { get; private set; }
@@ -20,32 +42,12 @@ public class Ticket
     public User? AssignedToUser { get; private set; }
     public Department Department { get; private set; } = default!;
 
-    public Ticket(
-        string title, 
-        string description, 
-        TicketPriority priority, 
-        Guid createdByUserId, 
-        Guid departmentId)
-    {
-        Id = Guid.NewGuid();
-        Title = title;
-        Description = description;
-        Status = TicketStatus.Open;
-        Priority = priority;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
-        CreatedByUserId = createdByUserId;
-        DepartmentId = departmentId;
-    }
-
-    private Ticket() { }
-
     public void Update(
-        string title, 
-        string description, 
-        TicketStatus status, 
-        TicketPriority priority, 
-        Guid? assignedToUserId, 
+        string title,
+        string description,
+        TicketStatus status,
+        TicketPriority priority,
+        Guid? assignedToUserId,
         Guid departmentId)
     {
         Title = title;
@@ -57,12 +59,7 @@ public class Ticket
         UpdatedAt = DateTime.UtcNow;
 
         if (status == TicketStatus.Closed && ClosedAt is null)
-        {
             ClosedAt = DateTime.UtcNow;
-        }
-        else if (status != TicketStatus.Closed)
-        {
-            ClosedAt = null;
-        }
+        else if (status != TicketStatus.Closed) ClosedAt = null;
     }
 }

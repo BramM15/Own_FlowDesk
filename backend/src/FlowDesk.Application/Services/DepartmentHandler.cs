@@ -1,6 +1,7 @@
 // src/FlowDesk.Application/Services/DepartmentHandler.cs
-using FlowDesk.Domain.Entities;
+
 using FlowDesk.Application.Interfaces;
+using FlowDesk.Domain.Entities;
 
 namespace FlowDesk.Application.Services;
 
@@ -16,8 +17,8 @@ public class DepartmentHandler
     public async Task<Department> AddAsync(string name, string description)
     {
         var department = new Department(name, description);
-        
-        await _repository.AddAsync(department); 
+
+        await _repository.AddAsync(department);
 
         return department;
     }

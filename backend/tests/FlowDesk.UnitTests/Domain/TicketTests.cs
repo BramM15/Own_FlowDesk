@@ -1,6 +1,5 @@
 ﻿using FlowDesk.Domain.Entities;
 using FlowDesk.Domain.Enums;
-using Xunit;
 
 namespace FlowDesk.UnitTests.Domain;
 
@@ -29,7 +28,7 @@ public class TicketTests
         Assert.Equal(departmentId, ticket.DepartmentId);
         Assert.Null(ticket.AssignedToUserId);
         Assert.Null(ticket.ClosedAt);
-        
+
         // Controleer of de tijden ongeveer 'nu' zijn ingesteld
         Assert.True((DateTime.UtcNow - ticket.CreatedAt).TotalSeconds < 1);
         Assert.True((DateTime.UtcNow - ticket.UpdatedAt).TotalSeconds < 1);
@@ -41,15 +40,16 @@ public class TicketTests
         // Arrange
         var ticket = new Ticket("Oud", "Oud", TicketPriority.Low, Guid.NewGuid(), Guid.NewGuid());
         var oldUpdatedAt = ticket.UpdatedAt;
-        
+
         // Wacht heel even zodat we zeker weten dat UpdatedAt verandert
-        Thread.Sleep(10); 
+        Thread.Sleep(10);
 
         var assignedUserId = Guid.NewGuid();
         var newDepartmentId = Guid.NewGuid();
 
         // Act
-        ticket.Update("Nieuw", "Nieuw", TicketStatus.InProgress, TicketPriority.Medium, assignedUserId, newDepartmentId);
+        ticket.Update("Nieuw", "Nieuw", TicketStatus.InProgress, TicketPriority.Medium, assignedUserId,
+            newDepartmentId);
 
         // Assert
         Assert.Equal("Nieuw", ticket.Title);

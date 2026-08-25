@@ -3,15 +3,14 @@ using FlowDesk.Application.Services;
 using FlowDesk.Domain.Entities;
 using FlowDesk.Domain.Enums;
 using Moq;
-using Xunit;
 
 namespace FlowDesk.UnitTests.Application;
 
 public class UserHandlerTests
 {
-    private readonly Mock<IUserRepository> _mockRepo;
-    private readonly Mock<IPasswordHasher> _mockHasher;
     private readonly UserHandler _handler;
+    private readonly Mock<IPasswordHasher> _mockHasher;
+    private readonly Mock<IUserRepository> _mockRepo;
 
     public UserHandlerTests()
     {
@@ -44,8 +43,8 @@ public class UserHandlerTests
         // Arrange
         var users = new List<User>
         {
-            new User("A", "A", "a@a.com", "hash", default, Guid.NewGuid()),
-            new User("B", "B", "b@b.com", "hash", default, Guid.NewGuid())
+            new("A", "A", "a@a.com", "hash", default, Guid.NewGuid()),
+            new("B", "B", "b@b.com", "hash", default, Guid.NewGuid())
         };
         _mockRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(users);
 
@@ -61,7 +60,7 @@ public class UserHandlerTests
     {
         // Arrange
         var deptId = Guid.NewGuid();
-        var users = new List<User> { new User("A", "A", "a@a.com", "hash", default, deptId) };
+        var users = new List<User> { new("A", "A", "a@a.com", "hash", default, deptId) };
         _mockRepo.Setup(r => r.GetByDepartmentAsync(deptId)).ReturnsAsync(users);
 
         // Act
@@ -98,7 +97,7 @@ public class UserHandlerTests
         _mockRepo.Setup(r => r.ExistsByEmailAsync(email)).ReturnsAsync(true);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => 
+        var exception = await Assert.ThrowsAsync<Exception>(() =>
             _handler.CreateAsync("Test", "User", email, "password123", default, Guid.NewGuid()));
 
         Assert.Equal("Email already exists", exception.Message);
@@ -112,13 +111,13 @@ public class UserHandlerTests
         var email = "new@test.com";
         var plainPassword = "SecretPassword!";
         var hashedPassword = "HashedSecretPassword!";
-        
+
         _mockRepo.Setup(r => r.ExistsByEmailAsync(email)).ReturnsAsync(false);
         _mockHasher.Setup(h => h.Hash(plainPassword)).Returns(hashedPassword);
 
         // We laten de repository de gesavede user teruggeven (zoals het hoort in je applicatie)
         _mockRepo.Setup(r => r.AddAsync(It.IsAny<User>()))
-                 .ReturnsAsync((User u) => u);
+            .ReturnsAsync((User u) => u);
 
         // Act
         var result = await _handler.CreateAsync("Test", "User", email, plainPassword, default, Guid.NewGuid());
@@ -127,7 +126,7 @@ public class UserHandlerTests
         Assert.NotNull(result);
         Assert.Equal(email, result.Email);
         Assert.Equal(hashedPassword, result.PasswordHash); // Controleer of het GEHASHDE wachtwoord in de entiteit zit
-        
+
         _mockRepo.Verify(r => r.AddAsync(It.IsAny<User>()), Times.Once);
     }
 
@@ -141,7 +140,7 @@ public class UserHandlerTests
         _mockRepo.Setup(r => r.GetAsync(userId)).ReturnsAsync((User?)null);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<Exception>(() => 
+        var exception = await Assert.ThrowsAsync<Exception>(() =>
             _handler.UpdateAsync(userId, default, Guid.NewGuid()));
 
         Assert.Equal("User not found", exception.Message);

@@ -3,7 +3,6 @@ using FlowDesk.Infrastructure.Database;
 using FlowDesk.Infrastructure.Repositories;
 using FlowDesk.IntegrationTests.Setup;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace FlowDesk.IntegrationTests.Repositories;
 
@@ -23,7 +22,7 @@ public class DepartmentRepositoryTests : IClassFixture<CustomApiFactory>
         using var scope = _factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var repository = new DepartmentRepository(dbContext);
-        
+
         var department = new Department("Marketing", "Marketing afdeling");
 
         // Act
@@ -42,7 +41,7 @@ public class DepartmentRepositoryTests : IClassFixture<CustomApiFactory>
         using var scope = _factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var repository = new DepartmentRepository(dbContext);
-        
+
         var department = new Department("To Delete", "Zal worden verwijderd");
         await dbContext.Departments.AddAsync(department);
         await dbContext.SaveChangesAsync();

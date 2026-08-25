@@ -3,7 +3,6 @@ using FlowDesk.Domain.Entities;
 using FlowDesk.Domain.Enums;
 using FlowDesk.Infrastructure.Authentication;
 using Microsoft.Extensions.Configuration;
-using Xunit;
 
 namespace FlowDesk.UnitTests.Authenticatie;
 
@@ -18,7 +17,7 @@ public class JwtProviderTests
         var inMemorySettings = new Dictionary<string, string?>
         {
             { "JwtSettings:Secret", "DitIsEenSuperLangeEnGeheimeSleutelVoorDeJwtToken123!" },
-            
+
             // Voeg hier eventuele overige JWT-velden toe als jouw code daar ook naar zoekt:
             { "JwtSettings:Issuer", "FlowDeskAuthServer" },
             { "JwtSettings:Audience", "FlowDeskApi" }
@@ -37,11 +36,11 @@ public class JwtProviderTests
         // Arrange
         var departmentId = Guid.NewGuid();
         var user = new User(
-            "John", 
-            "Doe", 
-            "john.doe@flowdesk.nl", 
-            "hashed_password_xyz", 
-            UserRole.Support, 
+            "John",
+            "Doe",
+            "john.doe@flowdesk.nl",
+            "hashed_password_xyz",
+            UserRole.Support,
             departmentId
         );
 
@@ -57,14 +56,14 @@ public class JwtProviderTests
         Assert.True(tokenHandler.CanReadToken(token));
 
         var jwtToken = tokenHandler.ReadJwtToken(token);
-        
+
         // Controleer de claims die JwtProvider erin heeft gestopt (sub, email, role)
         var subClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
         var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value;
 
         Assert.Equal(user.Id.ToString(), subClaim);
         Assert.Equal(user.Email, emailClaim);
-        
+
         // Controleer of de configuratiewaarden juist zijn toegepast
         Assert.Equal("FlowDeskAuthServer", jwtToken.Issuer);
     }

@@ -1,4 +1,5 @@
 ﻿// backend/src/FlowDesk.Application/Interfaces/IPasswordHasher.cs
+
 namespace FlowDesk.Application.Interfaces;
 
 public interface IPasswordHasher
